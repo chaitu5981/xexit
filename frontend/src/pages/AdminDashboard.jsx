@@ -13,6 +13,8 @@ const AdminDashboard = () => {
   const [lwd, setLwd] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentId, setCurrentId] = useState(null);
+  const [showResponses, setShowResponses] = useState(false);
+  const [responses, setResponses] = useState([]);
   const navigate = useNavigate();
   const logout = () => {
     toast("Logged out successfully", { type: "success" });
@@ -58,8 +60,21 @@ const AdminDashboard = () => {
       toast(error.response.data.message, { type: "error" });
     }
   };
+  const fetchResponses = async () => {
+    try {
+      const { data } = await axiosApi.get("/admin/exit_responses", {
+        headers: {
+          Authorization: token,
+        },
+      });
+      setResponses(data.data);
+    } catch (error) {
+      toast(error.response.data.message, { type: "error" });
+    }
+  };
   useEffect(() => {
     fetchResignations();
+    fetchResponses();
   }, []);
   return (
     <div className="w-full  gap-10 flex flex-col p-10 items-center min-h-screen bg-amber-100">
@@ -106,6 +121,27 @@ const AdminDashboard = () => {
           </div>
         ))}
       </div>
+      <button
+        onClick={() => setShowResponses(!showResponses)}
+        className="bg-green-400  py-2 px-3 rounded-md cursor-pointer mx-auto"
+      >
+        {showResponses ? "Hide" : "Show"} Responses
+      </button>
+      {showResponses &&
+        responses.map((r, i) => (
+          <div
+            key={i}
+            className="w-[55%] rounded bg-white flex flex-col p-6 gap-4"
+          >
+            <p>Employee ID : {r.employeeId}</p>
+            {r.responses.map((resp, j) => (
+              <div key={j}>
+                <p>{resp.questionText}</p>
+                <p>{resp.response}</p>
+              </div>
+            ))}
+          </div>
+        ))}
       {showModal && (
         <div className="fixed  inset-0 bg-black/50 flex justify-center items-center">
           <div className="w-[40%] rounded bg-white flex flex-col p-6 gap-4">
