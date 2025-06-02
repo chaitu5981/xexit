@@ -18,6 +18,7 @@ const concludeRegistration = async (req, res) => {
   const resignationId = req.body.resignationId;
   const approved = req.body.approved;
   const lwd = req.body?.lwd;
+
   try {
     const resignation = await Resignation.findById(resignationId);
     console.log(resignation);
